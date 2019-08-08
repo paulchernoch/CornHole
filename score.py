@@ -560,7 +560,7 @@ class TestGame(object):
         self.game = Game(tags, sensors, 
             lambda : self.read_button_states(), 
             lambda message, a_total, a_game, a_turn, b_total, b_game, b_turn : self.display_score(message, a_total, a_game, a_turn, b_total, b_game, b_turn))
-        self.game.log = lambda message : print(f'LOG: {message}')
+        # self.game.log = lambda message : print(f'LOG: {message}')
         self.game.timeout_in_seconds = 300
 
 
