@@ -586,8 +586,8 @@ class CornHoleApp:
         self.message_variable = tk.StringVar()
 
         self.font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 18, weight = "bold")
-        self.medium_font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 48, weight = "bold")
-        self.big_font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 96, weight = "bold")
+        self.medium_font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 42, weight = "bold")
+        self.big_font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 60, weight = "bold")
         self.window.title("Corn Hole")
 
         # To fix window size:
@@ -613,7 +613,7 @@ class CornHoleApp:
         self.a_minus_button = self.counter_button('-', '#cc4d12', lambda : self.change_turn_score_and_redisplay('A', -1))
         self.b_plus_button = self.counter_button('+', '#cc4d12', lambda : self.change_turn_score_and_redisplay('B', 1))
         self.b_minus_button = self.counter_button('-', '#cc4d12', lambda : self.change_turn_score_and_redisplay('B', -1))
-        self.new_turn_button = self.counter_button('>', '#ebc034', lambda : self.end_turn())
+        self.new_turn_button = self.counter_button('  >  ', '#ebc034', lambda : self.end_turn())
 
 
         self.team_a_label.grid(row = 0, column = 0, sticky = tk.NW)
@@ -626,7 +626,7 @@ class CornHoleApp:
         self.a_plus_button.grid(row = 0, column = 4, sticky = tk.NW)
         self.b_minus_button.grid(row = 1, column = 3, sticky = tk.E)
         self.b_plus_button.grid(row = 1, column = 4, sticky = tk.E)
-        self.new_turn_button.grid(row = 2, column = 3, sticky = tk.E)
+        self.new_turn_button.grid(row = 2, column = 2, columnspan = 2, sticky = tk.E)
         self.message.grid(row = 2, column = 0, columnspan = 2, sticky = tk.S)
 
         return self
