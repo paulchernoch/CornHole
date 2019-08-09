@@ -3,6 +3,8 @@ from enum import Enum
 from enum import auto
 import time
 import sys
+import tkinter as tk
+import tkinter.font
 
 class Team(Enum):
     UNKNOWN = auto()
@@ -517,6 +519,136 @@ class Game(object):
         return f'Team A: {self.team_a_game_score}  Team B: {self.team_b_game_score}'
 
 ##########################################
+#            CornHoleApp                 #
+##########################################
+
+class CornHoleApp:
+    def __init__(self):   
+        test_game = TestGame()
+        self.game = test_game.game
+        # Need to replace the drivers, sensors...
+
+    def new_game(self):
+        self.zero_scores()
+        self.turn_number = 1
+        self.redisplay_scores()
+
+    def zero_scores(self):
+        # A fixed, A turn, B fixed, B turn
+        self.scores = [0,0,0,0]
+
+    def change_turn_score(self, team_letter, delta):
+        if team_letter == 'A':
+            self.scores[1] = max(0, self.scores[1] + delta)
+        else:
+            self.scores[3] = max(0, self.scores[3] + delta)
+
+    def change_turn_score_and_redisplay(self, team_letter, delta):
+        self.change_turn_score(team_letter, delta)
+        self.redisplay_scores()
+
+    def end_turn(self):
+        a_total_score = self.get_total_score('A')
+        b_total_score = self.get_total_score('B')
+        self.scores = [a_total_score,0,b_total_score,0]
+        self.turn_number += 1
+        self.redisplay_scores()
+    
+    def get_total_score(self, team_letter):
+        if team_letter == 'A':
+            return self.scores[0] + max(0, self.scores[1] - self.scores[3])
+        else:
+            return self.scores[2] + max(0, self.scores[3] - self.scores[1])
+
+    def redisplay_scores(self):
+        a_score = self.get_total_score("A")
+        b_score = self.get_total_score("B")
+        self.team_a_score_variable.set(f'{a_score}')
+        self.team_b_score_variable.set(f'{b_score}')
+        self.team_a_turn_score_variable.set(f'   {self.scores[1]}')
+        self.team_b_turn_score_variable.set(f'   {self.scores[3]}')
+        if a_score >= 21 and a_score > b_score:
+            message = 'Home wins!'
+        elif b_score >= 21 and b_score > a_score:
+            message = 'Visitors win!'
+        else:
+            message = f'Turn {self.turn_number}'
+        self.message_variable.set(message)
+
+    def build(self):
+        self.window = tk.Tk()
+
+        # Dynamic variables that control the display
+        self.team_a_score_variable = tk.StringVar()
+        self.team_b_score_variable = tk.StringVar()
+        self.team_a_turn_score_variable = tk.StringVar()
+        self.team_b_turn_score_variable = tk.StringVar()
+        self.message_variable = tk.StringVar()
+
+        self.font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 18, weight = "bold")
+        self.medium_font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 48, weight = "bold")
+        self.big_font = tkinter.font.Font(root = self.window, family = 'Helvetica', size = 96, weight = "bold")
+        self.window.title("Corn Hole")
+
+        # To fix window size:
+        # self.window.geometry("800x600")
+
+        # To prevent resizing:
+        # self.window.resizable(0, 0)
+
+        # Team Name Labels
+        self.team_a_label = tk.Label(self.window, text="Home  ", font = self.big_font)
+        self.team_b_label = tk.Label(self.window, text="Visitors  ", font = self.big_font)
+
+        # Score display
+        self.new_game()
+        self.team_a_score = tk.Label(self.window, textvariable=self.team_a_score_variable, font = self.big_font)
+        self.team_b_score = tk.Label(self.window, textvariable=self.team_b_score_variable, font = self.big_font)
+        self.team_a_turn_score = tk.Label(self.window, textvariable=self.team_a_turn_score_variable, font = self.big_font)
+        self.team_b_turn_score = tk.Label(self.window, textvariable=self.team_b_turn_score_variable, font = self.big_font)
+        self.message = tk.Label(self.window, textvariable=self.message_variable, font = self.medium_font)
+
+        # Buttons
+        self.a_plus_button = self.counter_button('+', '#cc4d12', lambda : self.change_turn_score_and_redisplay('A', 1))
+        self.a_minus_button = self.counter_button('-', '#cc4d12', lambda : self.change_turn_score_and_redisplay('A', -1))
+        self.b_plus_button = self.counter_button('+', '#cc4d12', lambda : self.change_turn_score_and_redisplay('B', 1))
+        self.b_minus_button = self.counter_button('-', '#cc4d12', lambda : self.change_turn_score_and_redisplay('B', -1))
+        self.new_turn_button = self.counter_button('>', '#ebc034', lambda : self.end_turn())
+
+
+        self.team_a_label.grid(row = 0, column = 0, sticky = tk.NW)
+        self.team_b_label.grid(row = 1, column = 0, sticky = tk.W)
+        self.team_a_score.grid(row = 0, column = 1, sticky = tk.NE)
+        self.team_b_score.grid(row = 1, column = 1, sticky = tk.E)
+        self.team_a_turn_score.grid(row = 0, column = 2, sticky = tk.NE)
+        self.team_b_turn_score.grid(row = 1, column = 2, sticky = tk.E)
+        self.a_minus_button.grid(row = 0, column = 3, sticky = tk.NW)
+        self.a_plus_button.grid(row = 0, column = 4, sticky = tk.NW)
+        self.b_minus_button.grid(row = 1, column = 3, sticky = tk.E)
+        self.b_plus_button.grid(row = 1, column = 4, sticky = tk.E)
+        self.new_turn_button.grid(row = 2, column = 3, sticky = tk.E)
+        self.message.grid(row = 2, column = 0, columnspan = 2, sticky = tk.S)
+
+        return self
+    
+    def counter_button(self, label, color, action):
+        return tk.Button(
+            self.window, 
+            text = label, 
+            font = self.big_font, 
+            command = action, 
+            bg = color, 
+            height = 1, 
+            width = 1
+        )
+
+    def exit_program(self):
+        self.window.quit()
+
+    def run(self):
+        tk.mainloop()
+
+##########################################
 #            Test Classes                #
 ##########################################
 
@@ -560,7 +692,7 @@ class TestGame(object):
         self.game = Game(tags, sensors, 
             lambda : self.read_button_states(), 
             lambda message, a_total, a_game, a_turn, b_total, b_game, b_turn : self.display_score(message, a_total, a_game, a_turn, b_total, b_game, b_turn))
-        # self.game.log = lambda message : print(f'LOG: {message}')
+        self.game.log = lambda message : print(f'LOG: {message}')
         self.game.timeout_in_seconds = 300
 
 
@@ -570,5 +702,6 @@ if len(sys.argv) > 1 and sys.argv[len(sys.argv) - 1] == "test":
     test_game.game.play()
     print('Quitting\n')
 else:
-    print('Raspberry Pi interface not yet implemented\n')
+    app = CornHoleApp()
+    app.build().run()
 
